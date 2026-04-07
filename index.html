@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Two Worlds | Main / NPC</title>
+  <meta name="description" content="Два мира в одном сайте: превращай свой день в фильм или узнай, насколько ты NPC." />
+  <style>
+    :root {
+      --bg-1: #05070d;
+      --bg-2: #0b1020;
+      --bg-3: #11182c;
+      --card: rgba(255,255,255,0.06);
+      --card-strong: rgba(255,255,255,0.1);
+      --border: rgba(255,255,255,0.12);
+      --text: #eef2ff;
+      --muted: #a6b1cf;
+      --accent: #7c9cff;
+      --accent-2: #ae7cff;
+      --danger: #ff5d7a;
+      --good: #73f0b3;
+      --warning: #ffd36e;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --maxw: 1180px;
+      --transition: 220ms ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(124,156,255,0.18), transparent 28%),
+        radial-gradient(circle at 80% 15%, rgba(174,124,255,0.16), transparent 24%),
+        radial-gradient(circle at 70% 80%, rgba(255,93,122,0.11), transparent 22%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2) 55%, #05070d);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.28), rgba(0,0,0,0.06));
+      opacity: 0.28;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px);
+      background-size: 8px 8px;
+      mix-blend-mode: soft-light;
+    }
+
+    .app {
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 42px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background:
+        linear-gradient(135deg, rgba(124,156,255,0.9), rgba(174,124,255,0.8));
+      box-shadow:
+        0 0 30px rgba(124,156,255,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.28);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      border-radius: 999px;
+    }
+
+    .brand-mark::before {
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(255,255,255,0.85);
+      opacity: 0.9;
+      top: -3px;
+      left: -5px;
+    }
+
+    .brand-mark::after {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.65);
+      bottom: -4px;
+      right: -4px;
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      font-size: clamp(22px, 2.8vw, 30px);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-text p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(14px);
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform var(--transition), background var(--transition), border-color var(--transition), box-shadow var(--transition), opacity var(--transition);
+      box-shadow: var(--shadow);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(124,156,255,0.28), rgba(174,124,255,0.24));
+      border-color: rgba(124,156,255,0.35);
+      box-shadow:
+        0 8px 24px rgba(76, 112, 255, 0.18),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, rgba(255,93,122,0.18), rgba(255,93,122,0.11));
+      border-color: rgba(255,93,122,0.24);
+    }
+
+    .hero {
+      margin-bottom: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: clamp(22px, 4vw, 34px);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background:
+        radial-gradient(circle at 25% 35%, rgba(124,156,255,0.18), transparent 18%),
+        radial-gradient(circle at 75% 40%, rgba(174,124,255,0.12), transparent 18%);
+      pointer-events: none;
+      filter: blur(10px);
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .hero-copy h2 {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 5vw, 56px);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      max-width: 10ch;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(15px, 1.7vw, 18px);
+      line-height: 1.65;
+      max-width: 64ch;
+    }
+
+    .badge-row {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .hero-panel {
+      border-radius: 22px;
+      padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+      border: 1px solid var(--border);
+      min-height: 250px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: auto auto -18% -8%;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,156,255,0.28), transparent 70%);
+      filter: blur(6px);
+    }
+
+    .hero-mini {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-card {
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .mini-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .worlds {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-bottom: 26px;
+    }
+
+    .world-card {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      min-height: 290px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .world-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .world-card h3 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: -0.04em;
+    }
+
+    .world-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 48ch;
+    }
+
+    .world-card .world-footer {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .world-card.movie {
+      background:
+        radial-gradient(circle at 80% 22%, rgba(124,156,255,0.18), transparent 20%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025));
+    }
+
+    .world-card.npc {
+      background:
+        radial-gradient(circle at 85% 15%, rgba(255,93,122,0.13), transparent 22%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025));
+    }
+
+    .section {
+      display: none;
+      margin-top: 8px;
+      animation: fadeUp 350ms ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .panel {
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3vw, 28px);
+    }
+
+    .panel + .panel {
+      margin-top: 18px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      max-width: 70ch;
+    }
+
+    .section-title h4 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: -0.04em;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .field-group {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px 14px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #8994b3;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 148px;
+      line-height: 1.6;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(124,156,255,0.45);
+      background: rgba(255,255,255,0.065);
+      box-shadow: 0 0 0 4px rgba(124,156,255,0.12);
+    }
+
+    .hint {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .result-card {
+      border-radius: 22px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      min-height: 240px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -10% -22% auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(174,124,255,0.2), transparent 70%);
+      pointer-events: none;
+    }
+
+    .result-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .result-title {
+      position: relative;
+      z-index: 1;
+      margin: 8px 0 12px;
+      font-size: clamp(22px, 2.8vw, 30px);
+      letter-spacing: -0.03em;
+    }
+
+    .result-text {
+      position: relative;
+      z-index: 1;
+      color: #e8edff;
+      line-height: 1.78;
+      white-space: pre-wrap;
+      font-size: 16px;
+    }
+
+    .result-sub {
+      position: relative;
+      z-index: 1;
+      margin-top: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .qa-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .question {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .question h5 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .option:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.14);
+    }
+
+    .option input {
+      width: auto;
+      margin-top: 2px;
+      accent-color: #91a8ff;
+      cursor: pointer;
+    }
+
+    .option span {
+      display: block;
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .score-hero {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .score-ring {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        conic-gradient(var(--danger) 0deg, var(--danger) var(--deg, 0deg), rgba(255,255,255,0.08) var(--deg, 0deg));
+      box-shadow: inset 0 0 0 10px rgba(255,255,255,0.04);
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .score-ring::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(8,12,24,0.95), rgba(8,12,24,0.86));
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .score-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .score-inner strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .score-inner span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .score-copy h5 {
+      margin: 0 0 8px;
+      font-size: clamp(22px, 3vw, 30px);
+      letter-spacing: -0.03em;
+    }
+
+    .score-copy p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 56ch;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      opacity: 0.9;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(10,14,26,0.94);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease, transform 200ms ease;
+      z-index: 50;
+      max-width: calc(100% - 24px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .worlds,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .section-header {
+        flex-direction: column;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .top-actions {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        width: min(var(--maxw), calc(100% - 20px));
+        padding-top: 16px;
+      }
+
+      .hero,
+      .panel,
+      .world-card {
+        border-radius: 20px;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .top-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-text">
+          <h1>Two Worlds</h1>
+          <p>Один день. Два режима. Герой фильма или scripted NPC.</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="btn" id="goHomeBtn">Главный экран</button>
+        <button class="btn" id="randomDemoBtn">Случайный пример</button>
+      </div>
+    </header>
+
+    <section class="hero" id="homeSection">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <h2>Два мира в одной рутине</h2>
+          <p>
+            Обычный день можно романтизировать как кино. Или разобрать как набор повторяющихся паттернов.
+            Вопрос не в том, что из этого правда. Вопрос в том, какой режим ты включаешь на себя сам.
+          </p>
+
+          <div class="badge-row">
+            <div class="badge">🎬 cinematic synopsis</div>
+            <div class="badge">🤖 NPC scan</div>
+            <div class="badge">📱 mobile friendly</div>
+            <div class="badge">⚡ one-file app</div>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="hero-mini">
+            <div class="mini-card">
+              <strong>Твой день как фильм</strong>
+              <span>Пара фактов дня превращаются в синопсис, жанр, tagline и fake rating. Людям нужно не событие. Им нужен смысл.</span>
+            </div>
+            <div class="mini-card">
+              <strong>Насколько ты NPC</strong>
+              <span>Саркастичный тест на автопилот, повторяемость, цифровую рутину и банальные ответы. Удивительно, как охотно люди смеются над собственной предсказуемостью.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="worlds" id="worldsSection">
+      <article class="world-card movie">
+        <div>
+          <h3>🎬 Твой день как фильм</h3>
+          <p>
+            Введи несколько фактов своего дня. Сайт превратит их в кинематографичный синопсис, как будто твоя рутина была написана слишком хорошим сценаристом.
+          </p>
+        </div>
+        <div class="world-footer">
+          <button class="btn btn-primary" data-open="movieSection">Открыть мир фильма</button>
+        </div>
+      </article>
+
+      <article class="world-card npc">
+        <div>
+          <h3>🤖 Насколько ты NPC</h3>
+          <p>
+            Пройди тест из повседневных привычек и получи процент NPC, уровень автопилота и язвительный итог. Очень полезно, если тебе вдруг стало казаться, что ты уникален.
+          </p>
+        </div>
+        <div class="world-footer">
+          <button class="btn btn-primary" data-open="npcSection">Открыть NPC-скан</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="section" id="movieSection">
+      <div class="panel">
+        <div class="section-header">
+          <div class="section-title">
+            <h4>🎬 Твой день как фильм</h4>
+            <p>
+              Впиши 3-6 коротких фактов. По одному на строку. Добавь жанр и имя героя, если хочешь.
+              Чем банальнее события, тем интереснее контраст. Интернет вообще живёт на контрасте.
+            </p>
+          </div>
+
+          <button class="btn" data-open="home">Назад</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <div>
+              <label for="heroName">Имя героя</label>
+              <input id="heroName" type="text" placeholder="Например: Он / Она / Арман / Айя / Незнакомец" maxlength="40" />
+            </div>
+
+            <div>
+              <label for="movieGenre">Жанр</label>
+              <select id="movieGenre">
+                <option value="noir">Noir</option>
+                <option value="romance">Romance</option>
+                <option value="sci-fi">Sci-Fi</option>
+                <option value="thriller">Thriller</option>
+                <option value="drama">Drama</option>
+                <option value="coming-of-age">Coming of Age</option>
+                <option value="surreal">Surreal</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="dayFacts">Факты дня</label>
+              <textarea id="dayFacts" placeholder="проснулся в 7&#10;пролил кофе&#10;увидел бывшую&#10;опоздал на автобус"></textarea>
+              <div class="hint">Каждая строка = отдельный факт. Рекомендуется 3-6 строк.</div>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn-primary" id="generateMovieBtn">Сделать сцену</button>
+              <button class="btn" id="fillMovieExampleBtn">Подставить пример</button>
+              <button class="btn btn-danger" id="clearMovieBtn">Очистить</button>
+            </div>
+          </div>
+
+          <div class="result-card" id="movieResultCard">
+            <div class="result-top">
+              <div class="chip" id="movieGenreChip">Жанр: Noir</div>
+              <div class="chip" id="movieRatingChip">IMDb: --</div>
+            </div>
+
+            <h5 class="result-title" id="movieTitle">Тут появится название сцены</h5>
+            <div class="result-text" id="movieText">
+              Введи факты и нажми «Сделать сцену».
+            </div>
+            <div class="result-sub" id="movieSub">
+              Здесь появятся tagline и короткое послевкусие.
+            </div>
+
+            <div class="actions">
+              <button class="btn hidden" id="copyMovieBtn">Скопировать результат</button>
+              <button class="btn hidden" id="shareMovieBtn">Поделиться</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="npcSection">
+      <div class="panel">
+        <div class="section-header">
+          <div class="section-title">
+            <h4>🤖 Насколько ты NPC</h4>
+            <p>
+              Ответь на вопросы честно. Здесь нет правильных ответов. Есть только степень того, насколько твоя жизнь уже оптимизирована до скуки.
+            </p>
+          </div>
+
+          <button class="btn" data-open="home">Назад</button>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="qa-list" id="npcQuestions"></div>
+
+            <div class="actions">
+              <button class="btn btn-primary" id="calculateNpcBtn">Проверить автопилот</button>
+              <button class="btn" id="randomNpcAnswersBtn">Случайные ответы</button>
+              <button class="btn btn-danger" id="clearNpcBtn">Сбросить</button>
+            </div>
+          </div>
+
+          <div class="result-card">
+            <div class="score-hero">
+              <div class="score-ring" id="scoreRing" style="--deg: 0deg;">
+                <div class="score-inner">
+                  <strong id="npcPercent">0%</strong>
+                  <span>NPC</span>
+                </div>
+              </div>
+
+              <div class="score-copy">
+                <h5 id="npcTitle">Ожидает сканирования</h5>
+                <p id="npcDescription">Результат появится после прохождения теста.</p>
+              </div>
+            </div>
+
+            <div class="result-text" id="npcResultText">
+              Пока пусто. Даже твой внутренний алгоритм ещё не запущен.
+            </div>
+
+            <div class="result-sub" id="npcSub">
+              Здесь будет итог, саркастичное описание и контр-статус Main Character.
+            </div>
+
+            <div class="actions">
+              <button class="btn hidden" id="copyNpcBtn">Скопировать результат</button>
+              <button class="btn hidden" id="shareNpcBtn">Поделиться</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      Two Worlds. Потому что один и тот же день можно пережить как историю или как скрипт.
+    </p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const state = {
+      movie: {
+        heroName: "",
+        genre: "noir",
+        facts: "",
+        resultText: "",
+        title: "",
+        sub: "",
+        rating: ""
+      },
+      npc: {
+        answers: {},
+        percent: 0,
+        title: "",
+        description: "",
+        resultText: "",
+        sub: ""
+      }
+    };
+
+    const movieGenreMeta = {
+      "noir": {
+        label: "Noir",
+        openers: [
+          "Город ещё не успел проснуться, а тишина уже выглядела подозрительно.",
+          "Утро началось как всегда, и именно поэтому ему нельзя было доверять.",
+          "В сером свете раннего часа даже случайности выглядели как чья-то работа."
+        ],
+        tone: [
+          "То, что выглядело мелочью, позже оказалось первым смещением всей траектории дня.",
+          "Каждая деталь казалась незначительной, пока не стала уликой против самого времени.",
+          "Обычные события начали складываться в рисунок, который лучше было не замечать."
+        ],
+        tagline: [
+          "Иногда день ломается не громко, а почти вежливо.",
+          "Не каждый сюжет начинается с выстрела. Иногда хватает пролитого кофе.",
+          "Самые тихие утра иногда скрывают худшие монтажные склейки."
+        ]
+      },
+      "romance": {
+        label: "Romance",
+        openers: [
+          "Утро было слишком обычным, чтобы кто-то заподозрил в нём начало маленькой истории.",
+          "День начинался без обещаний, но именно так обычно и приходят странные чувства.",
+          "В воздухе не было ничего особенного, кроме того невидимого напряжения, которое всегда предшествует встрече."
+        ],
+        tone: [
+          "Случайные детали неожиданно стали похожи на реплики, которые жизнь пишет без согласования.",
+          "Каждая мелочь будто мягко подталкивала день в сторону чего-то невысказанного.",
+          "Обычная рутина вдруг зазвучала так, как звучат вещи, которые позже вспоминают слишком долго."
+        ],
+        tagline: [
+          "Не каждый роман начинается с любви. Иногда он начинается с паузы.",
+          "Самые важные взгляды часто происходят между двумя банальными делами.",
+          "Некоторые дни не меняют жизнь. Они просто начинают её медленно переписывать."
+        ]
+      },
+      "sci-fi": {
+        label: "Sci-Fi",
+        openers: [
+          "Утро загрузилось как обычно, но мир уже работал с едва заметной ошибкой.",
+          "Система дня выглядела стабильной, пока не начала выдавать несинхронизированные события.",
+          "С самого начала в этой реальности было слишком много совпадений, чтобы считать их случайными."
+        ],
+        tone: [
+          "Факты дня начали вести себя как баги в знакомой симуляции.",
+          "Обычная последовательность событий вдруг напомнила цикл, который уже проходили раньше.",
+          "Чем внимательнее он смотрел на день, тем сильнее тот напоминал не жизнь, а повторяющийся запуск."
+        ],
+        tagline: [
+          "Возможно, это был просто вторник. Возможно, неудачный перезапуск мира.",
+          "Симуляция никогда не рушится сразу. Она сначала начинает повторяться.",
+          "Даже самые бытовые сбои иногда оказываются следами другой версии тебя."
+        ]
+      },
+      "thriller": {
+        label: "Thriller",
+        openers: [
+          "С первого часа день вёл себя слишком спокойно, и в этом уже было что-то тревожное.",
+          "Обычное утро редко предупреждает, когда собирается сорваться с привычной траектории.",
+          "Ничто не обещало напряжения, пока детали не начали складываться слишком плотно."
+        ],
+        tone: [
+          "Каждый новый факт не объяснял происходящее, а только сужал воздух вокруг.",
+          "События оставались банальными, но ощущение от них становилось всё менее безобидным.",
+          "То, что выглядело серией случайностей, постепенно стало похожим на заранее разложенный маршрут."
+        ],
+        tagline: [
+          "Тревога редко приходит с причиной. Сначала приходит ритм.",
+          "Самые неприятные дни маскируются под обычные.",
+          "Проблема не в том, что что-то случилось. Проблема в том, как идеально это совпало."
+        ]
+      },
+      "drama": {
+        label: "Drama",
+        openers: [
+          "День начинался тихо, как и многие дни до него, но внутри уже что-то сместилось.",
+          "Утро не обещало откровений, только ещё одну попытку пройти через себя привычным маршрутом.",
+          "Иногда жизнь не меняется резко. Она просто чуть сильнее давит на те же места."
+        ],
+        tone: [
+          "Мелкие события неожиданно стали зеркалами того, о чём давно не хотелось думать.",
+          "Каждая деталь дня будто мягко напоминала, что усталость тоже умеет говорить.",
+          "То, что снаружи выглядело как рутина, внутри ощущалось как тихое внутреннее движение."
+        ],
+        tagline: [
+          "Иногда самый тяжёлый конфликт происходит без свидетелей.",
+          "Не каждый перелом слышно. Некоторые живут под кожей.",
+          "Рутина редко ломает человека. Чаще она шлифует его до прозрачности."
+        ]
+      },
+      "coming-of-age": {
+        label: "Coming of Age",
+        openers: [
+          "Это был один из тех дней, которые выглядят обычными только до вечера.",
+          "Утро не обещало уроков, но жизнь не любит предупреждать заранее.",
+          "Иногда взросление прячется внутри нелепых мелочей и случайных задержек."
+        ],
+        tone: [
+          "Каждое небольшое происшествие словно незаметно сдвигало внутреннюю точку зрения.",
+          "День не стал большим событием, но в нём было достаточно деталей, чтобы стать поворотом.",
+          "То, что казалось просто набором неудобств, постепенно стало чем-то вроде внутреннего монтажа."
+        ],
+        tagline: [
+          "Взросление редко приходит торжественно. Чаще оно приходит в автобус, на который ты не успел.",
+          "Некоторые дни ничего не объясняют. Они просто делают тебя чуть другим.",
+          "Ты замечаешь перемену не в моменте. Ты замечаешь её потом."
+        ]
+      },
+      "surreal": {
+        label: "Surreal",
+        openers: [
+          "Утро началось как будто в реальности, но слишком быстро стало напоминать сон с точными деталями.",
+          "Всё выглядело знакомо, кроме странного ощущения, что день уже проживал себя где-то раньше.",
+          "Обычные предметы оставались на местах, но смысл между ними начал вести себя нестабильно."
+        ],
+        tone: [
+          "События не спорили с логикой, но почему-то всё равно выходили за её пределы.",
+          "Каждая мелочь ощущалась чуть более символичной, чем ей полагалось быть.",
+          "День двигался как сон, который притворяется документальным."
+        ],
+        tagline: [
+          "Иногда реальность теряет форму не полностью, а только достаточно, чтобы стало не по себе.",
+          "Самые странные дни часто состоят из абсолютно нормальных вещей.",
+          "Логика ещё присутствовала. Просто уже не руководила происходящим."
+        ]
+      }
+    };
+
+    const npcQuestions = [
+      {
+        id: "route",
+        text: "Ты почти всегда идёшь одной и той же дорогой, даже если есть другие варианты?",
+        options: [
+          { label: "Почти всегда. Мой маршрут уже прописан в коде.", value: 10 },
+          { label: "Часто, но иногда меняю.", value: 6 },
+          { label: "Редко. Мне быстро становится скучно.", value: 2 }
+        ]
+      },
+      {
+        id: "reels",
+        text: "Ты смотришь одни и те же Reels или похожий контент почти каждый день?",
+        options: [
+          { label: "Да. Алгоритм уже знает меня лучше меня.", value: 10 },
+          { label: "Иногда, но не всегда.", value: 5 },
+          { label: "Нет. Лента у меня хаотичная.", value: 1 }
+        ]
+      },
+      {
+        id: "food",
+        text: "Ты заказываешь или ешь одно и то же, потому что так проще?",
+        options: [
+          { label: "Да. Зачем ломать рабочий скрипт.", value: 9 },
+          { label: "Часто, но могу удивить себя.", value: 5 },
+          { label: "Нет. Мне нужно разнообразие.", value: 1 }
+        ]
+      },
+      {
+        id: "reply",
+        text: "На вопрос «как дела?» ты автоматически отвечаешь чем-то вроде «нормально»?",
+        options: [
+          { label: "Да. Это встроенный дефолтный ответ.", value: 10 },
+          { label: "Иногда.", value: 5 },
+          { label: "Нет. Я отвечаю по ситуации.", value: 2 }
+        ]
+      },
+      {
+        id: "days",
+        text: "Последние 5 дней были очень похожи друг на друга?",
+        options: [
+          { label: "Да, почти как копипаст.", value: 10 },
+          { label: "Отчасти.", value: 6 },
+          { label: "Нет, дни сильно отличались.", value: 2 }
+        ]
+      },
+      {
+        id: "autopilot",
+        text: "Бывает, что ты доходишь куда-то и не помнишь сам путь, потому что был на автопилоте?",
+        options: [
+          { label: "Часто. Мозг давно передал это фоновому процессу.", value: 10 },
+          { label: "Иногда.", value: 6 },
+          { label: "Редко.", value: 2 }
+        ]
+      },
+      {
+        id: "music",
+        text: "Ты неделями слушаешь один и тот же плейлист без особых изменений?",
+        options: [
+          { label: "Да. Этот цикл уже стал ритуалом.", value: 8 },
+          { label: "Иногда.", value: 4 },
+          { label: "Нет. Меняю музыку часто.", value: 1 }
+        ]
+      },
+      {
+        id: "smalltalk",
+        text: "Ты часто ведёшь одинаковые короткие диалоги по шаблону?",
+        options: [
+          { label: "Да. У меня есть стандартный набор фраз.", value: 9 },
+          { label: "Иногда.", value: 5 },
+          { label: "Нет. Общение у меня живое.", value: 2 }
+        ]
+      },
+      {
+        id: "timing",
+        text: "Ты встаёшь, ешь, работаешь и отдыхаешь примерно в одно и то же время?",
+        options: [
+          { label: "Да. Мой день можно синхронизировать по атомным часам.", value: 9 },
+          { label: "Частично.", value: 5 },
+          { label: "Нет. График плавающий.", value: 2 }
+        ]
+      },
+      {
+        id: "novelty",
+        text: "Ты специально избегаешь нового просто потому, что привычное удобнее?",
+        options: [
+          { label: "Да. Новое требует слишком много энергии.", value: 10 },
+          { label: "Иногда.", value: 5 },
+          { label: "Нет. Новое мне нужно.", value: 1 }
+        ]
+      }
+    ];
+
+    const els = {
+      homeSection: document.getElementById("homeSection"),
+      worldsSection: document.getElementById("worldsSection"),
+      movieSection: document.getElementById("movieSection"),
+      npcSection: document.getElementById("npcSection"),
+
+      goHomeBtn: document.getElementById("goHomeBtn"),
+      randomDemoBtn: document.getElementById("randomDemoBtn"),
+
+      heroName: document.getElementById("heroName"),
+      movieGenre: document.getElementById("movieGenre"),
+      dayFacts: document.getElementById("dayFacts"),
+      generateMovieBtn: document.getElementById("generateMovieBtn"),
+      fillMovieExampleBtn: document.getElementById("fillMovieExampleBtn"),
+      clearMovieBtn: document.getElementById("clearMovieBtn"),
+      movieGenreChip: document.getElementById("movieGenreChip"),
+      movieRatingChip: document.getElementById("movieRatingChip"),
+      movieTitle: document.getElementById("movieTitle"),
+      movieText: document.getElementById("movieText"),
+      movieSub: document.getElementById("movieSub"),
+      copyMovieBtn: document.getElementById("copyMovieBtn"),
+      shareMovieBtn: document.getElementById("shareMovieBtn"),
+
+      npcQuestions: document.getElementById("npcQuestions"),
+      calculateNpcBtn: document.getElementById("calculateNpcBtn"),
+      randomNpcAnswersBtn: document.getElementById("randomNpcAnswersBtn"),
+      clearNpcBtn: document.getElementById("clearNpcBtn"),
+      scoreRing: document.getElementById("scoreRing"),
+      npcPercent: document.getElementById("npcPercent"),
+      npcTitle: document.getElementById("npcTitle"),
+      npcDescription: document.getElementById("npcDescription"),
+      npcResultText: document.getElementById("npcResultText"),
+      npcSub: document.getElementById("npcSub"),
+      copyNpcBtn: document.getElementById("copyNpcBtn"),
+      shareNpcBtn: document.getElementById("shareNpcBtn"),
+
+      toast: document.getElementById("toast")
+    };
+
+    function showToast(text) {
+      els.toast.textContent = text;
+      els.toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => {
+        els.toast.classList.remove("show");
+      }, 2200);
+    }
+
+    function rand(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function clamp(n, min, max) {
+      return Math.min(Math.max(n, min), max);
+    }
+
+    function capitalize(str) {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function normalizeFact(text) {
+      return text.trim().replace(/\.$/, "");
+    }
+
+    function parseFacts(raw) {
+      return raw
+        .split("\n")
+        .map(normalizeFact)
+        .filter(Boolean)
+        .slice(0, 6);
+    }
+
+    function createMovieTitle(facts, genreLabel) {
+      const nouns = [
+        "Петля утра",
+        "Автобус мимо",
+        "Тихий сдвиг",
+        "Почти обычный день",
+        "Сцена без дубля",
+        "Маршрут без объяснений",
+        "Неловкое совпадение",
+        "Город после семи",
+        "Одна секунда позже",
+        "Тень в расписании"
+      ];
+      if (facts.some(f => /кофе/i.test(f))) return "Когда остывает кофе";
+      if (facts.some(f => /автобус|маршрут|дорог|такси|метро/i.test(f))) return "На секунду позже";
+      if (facts.some(f => /бывш|встретил|увидел/i.test(f))) return "Сцена с прошлым";
+      return rand(nouns) + " · " + genreLabel;
+    }
+
+    function createRating(genre) {
+      const bases = {
+        "noir": [7.8, 8.2],
+        "romance": [7.4, 8.0],
+        "sci-fi": [8.0, 8.7],
+        "thriller": [7.7, 8.4],
+        "drama": [7.9, 8.6],
+        "coming-of-age": [7.5, 8.3],
+        "surreal": [8.1, 8.9]
+      };
+      const [min, max] = bases[genre] || [7.4, 8.4];
+      return (Math.random() * (max - min) + min).toFixed(1);
+    }
+
+    function factsToSentence(facts, heroName) {
+      const subject = heroName?.trim() ? heroName.trim() : "он";
+      const intros = [
+        `${capitalize(subject)} проснулся`,
+        `${capitalize(subject)} начал день`,
+        `${capitalize(subject)} вошёл в этот день`,
+        `С самого утра ${subject}`
+      ];
+
+      const mapped = facts.map((fact, idx) => {
+        const clean = fact.charAt(0).toLowerCase() + fact.slice(1);
+        if (idx === 0) return `${rand(intros)}: ${clean}`;
+        if (idx === facts.length - 1) return `а позже ${clean}`;
+        return clean;
+      });
+
+      return mapped.join(", ") + ".";
+    }
+
+    function buildMovieSynopsis(heroName, genre, facts) {
+      const meta = movieGenreMeta[genre] || movieGenreMeta["noir"];
+      const opener = rand(meta.openers);
+      const tone = rand(meta.tone);
+      const tagline = rand(meta.tagline);
+      const chain = factsToSentence(facts, heroName);
+
+      const closerPool = [
+        "К вечеру стало ясно только одно: день был меньше похож на набор дел, чем на короткий фрагмент чьего-то слишком точного сценария.",
+        "И хотя формально ничего невероятного не произошло, внутри всё это ощущалось как монтажная точка, после которой история уже не идёт по-старому.",
+        "Снаружи это выглядело как рутина. Изнутри это уже было чем-то, что человек потом вспоминает слишком подробно.",
+        "Ни одна из этих деталей по отдельности ничего не значила. Вместе они стали настроением, которое не отпускает до ночи."
+      ];
+
+      const summary =
+        `${opener}\n\n` +
+        `${chain} ${tone}\n\n` +
+        `${rand(closerPool)}`;
+
+      return {
+        summary,
+        tagline
+      };
+    }
+
+    function generateMovie() {
+      const heroName = els.heroName.value.trim();
+      const genre = els.movieGenre.value;
+      const factsRaw = els.dayFacts.value;
+      const facts = parseFacts(factsRaw);
+
+      if (facts.length < 3) {
+        showToast("Нужно минимум 3 факта дня.");
+        return;
+      }
+
+      const meta = movieGenreMeta[genre] || movieGenreMeta["noir"];
+      const title = createMovieTitle(facts, meta.label);
+      const rating = createRating(genre);
+      const synopsisObj = buildMovieSynopsis(heroName, genre, facts);
+
+      const sub =
+        `Tagline: «${synopsisObj.tagline}»\n` +
+        `Режим восприятия: ${meta.label}. Главный персонаж: ${heroName || "Он"}.\n` +
+        `Иногда день не меняется. Меняется угол, под которым ты на него смотришь.`;
+
+      state.movie = {
+        heroName,
+        genre,
+        facts: factsRaw,
+        resultText: synopsisObj.summary,
+        title,
+        sub,
+        rating
+      };
+
+      renderMovieResult();
+      persistState();
+      showToast("Сцена сгенерирована.");
+    }
+
+    function renderMovieResult() {
+      const meta = movieGenreMeta[state.movie.genre] || movieGenreMeta["noir"];
+      els.movieGenreChip.textContent = `Жанр: ${meta.label}`;
+      els.movieRatingChip.textContent = `IMDb: ${state.movie.rating || "--"}`;
+      els.movieTitle.textContent = state.movie.title || "Тут появится название сцены";
+      els.movieText.textContent = state.movie.resultText || "Введи факты и нажми «Сделать сцену».";
+      els.movieSub.textContent = state.movie.sub || "Здесь появятся tagline и короткое послевкусие.";
+
+      const hasMovie = Boolean(state.movie.resultText);
+      els.copyMovieBtn.classList.toggle("hidden", !hasMovie);
+      els.shareMovieBtn.classList.toggle("hidden", !hasMovie);
+    }
+
+    function fillMovieExample() {
+      els.heroName.value = "Он";
+      els.movieGenre.value = "noir";
+      els.dayFacts.value = [
+        "проснулся в 7",
+        "пролил кофе",
+        "увидел бывшую у перехода",
+        "опоздал на автобус"
+      ].join("\n");
+      saveMovieFormToState();
+      renderMovieResult();
+      showToast("Пример подставлен.");
+    }
+
+    function clearMovie() {
+      els.heroName.value = "";
+      els.movieGenre.value = "noir";
+      els.dayFacts.value = "";
+      state.movie = {
+        heroName: "",
+        genre: "noir",
+        facts: "",
+        resultText: "",
+        title: "",
+        sub: "",
+        rating: ""
+      };
+      renderMovieResult();
+      persistState();
+      showToast("Раздел фильма очищен.");
+    }
+
+    function saveMovieFormToState() {
+      state.movie.heroName = els.heroName.value.trim();
+      state.movie.genre = els.movieGenre.value;
+      state.movie.facts = els.dayFacts.value;
+      persistState();
+    }
+
+    function buildNpcQuestions() {
+      els.npcQuestions.innerHTML = "";
+      npcQuestions.forEach((q, idx) => {
+        const wrap = document.createElement("div");
+        wrap.className = "question";
+
+        const title = document.createElement("h5");
+        title.textContent = `${idx + 1}. ${q.text}`;
+        wrap.appendChild(title);
+
+        const options = document.createElement("div");
+        options.className = "options";
+
+        q.options.forEach((opt, optIdx) => {
+          const label = document.createElement("label");
+          label.className = "option";
+
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = q.id;
+          input.value = String(opt.value);
+          input.dataset.questionId = q.id;
+
+          if (String(state.npc.answers[q.id]) === String(opt.value)) {
+            input.checked = true;
+          }
+
+          input.addEventListener("change", () => {
+            state.npc.answers[q.id] = Number(opt.value);
+            persistState();
+          });
+
+          const span = document.createElement("span");
+          span.textContent = opt.label;
+
+          label.appendChild(input);
+          label.appendChild(span);
+          options.appendChild(label);
+        });
+
+        wrap.appendChild(options);
+        els.npcQuestions.appendChild(wrap);
+      });
+    }
+
+    function calculateNpc() {
+      const answered = npcQuestions.map(q => state.npc.answers[q.id]).filter(v => typeof v === "number");
+      if (answered.length < npcQuestions.length) {
+        showToast("Ответь на все вопросы.");
+        return;
+      }
+
+      const total = answered.reduce((a, b) => a + b, 0);
+      const maxScore = npcQuestions.reduce((sum, q) => sum + Math.max(...q.options.map(o => o.value)), 0);
+      const percent = Math.round((total / maxScore) * 100);
+      const mainCharacter = 100 - percent;
+
+      let title = "";
+      let description = "";
+      let text = "";
+      let sub = "";
+
+      if (percent >= 80) {
+        title = "NPC 80%+ · Автопилот максимальный";
+        description = "Ты не просто любишь стабильность. Ты уже стал её побочным продуктом.";
+        text =
+          "Твой ритм предсказуем до опасной элегантности. Маршруты, ответы, привычки и цифровое поведение собраны в почти идеальный цикл. " +
+          "Это удобно. Это эффективно. И именно поэтому немного тревожно. " +
+          "Ты не потерян, но живёшь слишком гладко, чтобы не задать себе неприятный вопрос: ты выбираешь это сам или просто давно не останавливал скрипт?";
+        sub =
+          `Main Character Index: ${mainCharacter}%.\n` +
+          "Тебе не нужен новый человек. Тебе нужен новый сбой в системе.";
+      } else if (percent >= 60) {
+        title = "NPC 60%+ · Сюжет ещё жив, но ленится";
+        description = "Ты балансируешь между привычкой и личностью. Автопилот уже силён, но не окончателен.";
+        text =
+          "Ты всё ещё способен свернуть со старой дороги, но чаще всего не видишь в этом смысла. " +
+          "Сценарий твоего дня уже повторяется, просто не настолько, чтобы это сразу бросалось в глаза. " +
+          "Ты не фон. Но если ничего не менять, фон однажды начнёт носить твоё лицо.";
+        sub =
+          `Main Character Index: ${mainCharacter}%.\n` +
+          "Небольшая перемена в одном ритуале уже способна сломать весь паттерн.";
+      } else if (percent >= 40) {
+        title = "Граница между NPC и героем";
+        description = "У тебя ещё достаточно хаоса, чтобы не стать скриптом полностью.";
+        text =
+          "Ты местами повторяешься, местами живёшь по инерции, но система ещё не захватила весь внутренний ландшафт. " +
+          "В тебе достаточно привычек для стабильности и достаточно сбоев для индивидуальности. " +
+          "Это редкое состояние. Обычно люди скатываются в один из полюсов.";
+        sub =
+          `Main Character Index: ${mainCharacter}%.\n` +
+          "Ты ещё в том месте, где выборы действительно могут менять форму дня.";
+      } else {
+        title = "Main Character mode";
+        description = "Ты ещё не стал повторяющимся фоном собственной жизни.";
+        text =
+          "У тебя мало признаков жёсткого автопилота. Ты допускаешь новизну, меняешь траектории и не всегда даёшь привычке право решать за тебя. " +
+          "Это не значит, что ты свободен полностью. Но значит, что сценарий ещё пишется, а не только воспроизводится.";
+        sub =
+          `Main Character Index: ${mainCharacter}%.\n` +
+          "Сохрани это. Мир постоянно пытается упростить человека до шаблона.";
+      }
+
+      state.npc.percent = percent;
+      state.npc.title = title;
+      state.npc.description = description;
+      state.npc.resultText = text;
+      state.npc.sub = sub;
+
+      renderNpcResult();
+      persistState();
+      showToast("NPC-скан завершён.");
+    }
+
+    function renderNpcResult() {
+      const percent = state.npc.percent || 0;
+      els.npcPercent.textContent = `${percent}%`;
+      els.scoreRing.style.setProperty("--deg", `${Math.round((percent / 100) * 360)}deg`);
+      els.npcTitle.textContent = state.npc.title || "Ожидает сканирования";
+      els.npcDescription.textContent = state.npc.description || "Результат появится после прохождения теста.";
+      els.npcResultText.textContent = state.npc.resultText || "Пока пусто. Даже твой внутренний алгоритм ещё не запущен.";
+      els.npcSub.textContent = state.npc.sub || "Здесь будет итог, саркастичное описание и контр-статус Main Character.";
+
+      const hasNpc = Boolean(state.npc.resultText);
+      els.copyNpcBtn.classList.toggle("hidden", !hasNpc);
+      els.shareNpcBtn.classList.toggle("hidden", !hasNpc);
+
+      if (percent >= 70) {
+        els.scoreRing.style.background = `conic-gradient(var(--danger) 0deg, var(--danger) ${Math.round((percent / 100) * 360)}deg, rgba(255,255,255,0.08) ${Math.round((percent / 100) * 360)}deg)`;
+      } else if (percent >= 40) {
+        els.scoreRing.style.background = `conic-gradient(var(--warning) 0deg, var(--warning) ${Math.round((percent / 100) * 360)}deg, rgba(255,255,255,0.08) ${Math.round((percent / 100) * 360)}deg)`;
+      } else {
+        els.scoreRing.style.background = `conic-gradient(var(--good) 0deg, var(--good) ${Math.round((percent / 100) * 360)}deg, rgba(255,255,255,0.08) ${Math.round((percent / 100) * 360)}deg)`;
+      }
+    }
+
+    function randomizeNpcAnswers() {
+      npcQuestions.forEach(q => {
+        const opt = rand(q.options);
+        state.npc.answers[q.id] = opt.value;
+      });
+      buildNpcQuestions();
+      persistState();
+      showToast("Случайные ответы подставлены.");
+    }
+
+    function clearNpc() {
+      state.npc = {
+        answers: {},
+        percent: 0,
+        title: "",
+        description: "",
+        resultText: "",
+        sub: ""
+      };
+      buildNpcQuestions();
+      renderNpcResult();
+      persistState();
+      showToast("NPC-раздел очищен.");
+    }
+
+    function openSection(target) {
+      const isHome = target === "home";
+
+      els.homeSection.classList.toggle("hidden", !isHome);
+      els.worldsSection.classList.toggle("hidden", !isHome);
+
+      els.movieSection.classList.remove("active");
+      els.npcSection.classList.remove("active");
+
+      if (target === "movieSection") {
+        els.movieSection.classList.add("active");
+      } else if (target === "npcSection") {
+        els.npcSection.classList.add("active");
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Скопировано.");
+      } catch {
+        showToast("Не удалось скопировать.");
+      }
+    }
+
+    async function shareText(title, text) {
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, text });
+        } catch {}
+      } else {
+        await copyText(`${title}\n\n${text}`);
+      }
+    }
+
+    function persistState() {
+      try {
+        localStorage.setItem("twoWorldsState", JSON.stringify(state));
+      } catch {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem("twoWorldsState");
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+
+        if (parsed.movie) {
+          Object.assign(state.movie, parsed.movie);
+        }
+        if (parsed.npc) {
+          Object.assign(state.npc, parsed.npc);
+        }
+      } catch {}
+    }
+
+    function hydrateForms() {
+      els.heroName.value = state.movie.heroName || "";
+      els.movieGenre.value = state.movie.genre || "noir";
+      els.dayFacts.value = state.movie.facts || "";
+      renderMovieResult();
+      buildNpcQuestions();
+      renderNpcResult();
+    }
+
+    function randomDemo() {
+      const mode = Math.random() > 0.5 ? "movie" : "npc";
+
+      if (mode === "movie") {
+        openSection("movieSection");
+        const genres = Object.keys(movieGenreMeta);
+        const demoSets = [
+          ["проснулся слишком поздно", "не нашёл наушники", "встретил знакомого, которого не видел год", "пошёл другой дорогой домой"],
+          ["забыл зарядку", "кофе оказался слишком горьким", "получил странное сообщение", "лифт закрылся прямо перед ним"],
+          ["вышел раньше обычного", "город был почти пустой", "увидел человека, похожего на себя", "пропустил нужный поворот"]
+        ];
+        els.heroName.value = rand(["Он", "Она", "Незнакомец", "Арман", "Айя"]);
+        els.movieGenre.value = rand(genres);
+        els.dayFacts.value = rand(demoSets).join("\n");
+        saveMovieFormToState();
+        generateMovie();
+      } else {
+        openSection("npcSection");
+        randomizeNpcAnswers();
+        calculateNpc();
+      }
+    }
+
+    function bindEvents() {
+      document.querySelectorAll("[data-open]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.open;
+          if (target === "home") openSection("home");
+          else openSection(target);
+        });
+      });
+
+      els.goHomeBtn.addEventListener("click", () => openSection("home"));
+      els.randomDemoBtn.addEventListener("click", randomDemo);
+
+      els.heroName.addEventListener("input", saveMovieFormToState);
+      els.movieGenre.addEventListener("change", saveMovieFormToState);
+      els.dayFacts.addEventListener("input", saveMovieFormToState);
+
+      els.generateMovieBtn.addEventListener("click", generateMovie);
+      els.fillMovieExampleBtn.addEventListener("click", fillMovieExample);
+      els.clearMovieBtn.addEventListener("click", clearMovie);
+
+      els.copyMovieBtn.addEventListener("click", () => {
+        const text = `${state.movie.title}\n\n${state.movie.resultText}\n\n${state.movie.sub}`;
+        copyText(text);
+      });
+
+      els.shareMovieBtn.addEventListener("click", () => {
+        const text = `${state.movie.title}\n\n${state.movie.resultText}\n\n${state.movie.sub}`;
+        shareText("Твой день как фильм", text);
+      });
+
+      els.calculateNpcBtn.addEventListener("click", calculateNpc);
+      els.randomNpcAnswersBtn.addEventListener("click", randomizeNpcAnswers);
+      els.clearNpcBtn.addEventListener("click", clearNpc);
+
+      els.copyNpcBtn.addEventListener("click", () => {
+        const text = `${state.npc.title}\n\nNPC: ${state.npc.percent}%\n\n${state.npc.resultText}\n\n${state.npc.sub}`;
+        copyText(text);
+      });
+
+      els.shareNpcBtn.addEventListener("click", () => {
+        const text = `${state.npc.title}\n\nNPC: ${state.npc.percent}%\n\n${state.npc.resultText}\n\n${state.npc.sub}`;
+        shareText("Насколько ты NPC", text);
+      });
+    }
+
+    loadState();
+    bindEvents();
+    hydrateForms();
+    openSection("home");
+  </script>
+</body>
+</html>
